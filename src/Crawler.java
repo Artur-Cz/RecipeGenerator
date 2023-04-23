@@ -6,6 +6,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.PageLoadStrategy;
+import org.openqa.selenium.interactions.Actions;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +34,12 @@ public class Crawler {
             }
         }
     }
+
+    public static void clickElement(WebDriver driver, WebElement element){
+        Actions actions = new Actions(driver);
+        actions.moveToElement(element).click().perform();
+    }
+
     public static void loadMoreRecipes(WebDriver driver,  int maxPageLoads) throws InterruptedException {
         // zrob ponizsze kroki az nie bedzie widoczny "zaladuj wiecej" lub x sekund?// Znajdz Webelemnt "zaladuj wiecej"
         // Click znaleziony webelement
@@ -40,10 +48,10 @@ public class Crawler {
         WebElement loadMore = driver.findElement(By.xpath("//*[@id=\"LoadMore\"]"));
 
         WebElement cookies = driver.findElement(By.xpath("//button[@class=\"cbar-button technical\"]"));
-        cookies.click();
+        clickElement(driver, cookies);
 
         while(loadMore.isDisplayed()) {
-            loadMore.click();
+            clickElement(driver, loadMore);
 
             synchronized (driver) {
                 driver.wait(1000);
@@ -72,23 +80,19 @@ public class Crawler {
         chromeOptions.addArguments("--dns-prefetch-disable");
         chromeOptions.addArguments("--disable-gpu");
         chromeOptions.addArguments("--force-device-scale-factor=1");
+        chromeOptions.addArguments("--remote-allow-origins=*");
         chromeOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
 
         WebDriver driver = new ChromeDriver(chromeOptions);
 
-        // Maximize browser window
         driver.manage().window().maximize();
 
-        // Navigate to URL
         driver.get(url);
         loadMoreRecipes(driver, 2);
 
-        // Find the table element using xpath
-        // First element matching. How to find all of them? Collect in a list
         WebElement recipe = driver.findElement(By.xpath("//article[@itemtype=\"http://schema.org/Recipe\"]"));
         WebElement recipeParent = driver.findElement(By.xpath("//article[@itemtype=\"http://schema.org/Recipe\"]/.."));
 
-                // Go through each major version
         List<WebElement> recipes = recipeParent.findElements(By.xpath("//a[@itemprop=\"url\"]"));
 
 
@@ -99,9 +103,11 @@ public class Crawler {
 
         addRecipes(recipeLinks, recipes);
 
-//        for(String element : recipeLinks){
-//            System.out.println(element);
-//        }
+    //    int i=0;
+    //    for(String element : recipeLinks){
+    //         i++;
+    //        System.out.println(i+element);
+    //    }
 
         ArrayList<Recipe> recipeList = new ArrayList<>();
 

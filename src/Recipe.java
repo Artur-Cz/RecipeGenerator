@@ -9,8 +9,8 @@ import java.util.List;
 public class Recipe {
 
     final String ingredientsXpath = "//*[@id=\"RecipeCard\"]/p";
-    final String preparationXpath = "/html/body/main/article/div[4]/div[1]/div[3]/ol";
-    final String additionalInfoXpath = "/html/body/main/article/div[4]/div[1]/div[3]/ul";
+    final String preparationXpath = "//*[@id=\"RecipeCard\"]/div[@class=\"hyphenate\"]/ol";
+    final String additionalInfoXpath = "//*[@id=\"RecipeCard\"]/div[@class=\"hyphenate\"]/ul";
     final String titleXpath = "/html/head/title";
 
     private final String url;
