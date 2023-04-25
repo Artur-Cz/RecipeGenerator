@@ -2,19 +2,20 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Recipe {
+public class Recipe implements Serializable {
 
-    final String ingredientsXpath = "//*[@id=\"RecipeCard\"]/p";
-    final String preparationXpath = "//*[@id=\"RecipeCard\"]/div[@class=\"hyphenate\"]/ol";
-    final String additionalInfoXpath = "//*[@id=\"RecipeCard\"]/div[@class=\"hyphenate\"]/ul";
-    final String titleXpath = "/html/head/title";
+    transient String ingredientsXpath = "//*[@id=\"RecipeCard\"]/p";
+    transient String preparationXpath = "//*[@id=\"RecipeCard\"]/div[@class=\"hyphenate\"]/ol";
+    transient String additionalInfoXpath = "//*[@id=\"RecipeCard\"]/div[@class=\"hyphenate\"]/ul";
+    transient String titleXpath = "/html/head/title";
 
-    private final String url;
-    private final WebDriver driver;
+    transient final String url;
+    transient final WebDriver driver;
     private final ArrayList<String> ingredients;
     private final ArrayList<String> preparation;
     private final ArrayList<String> additionalInfo;

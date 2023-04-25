@@ -1,5 +1,4 @@
 
-import com.google.common.collect.Iterables;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -20,6 +19,7 @@ import java.util.List;
 
 
 public class Crawler {
+    private static final String recipeListUrl = "https://www.jadlonomia.com/rodzaj_dania/dania-glowne/";
 
     public static void addRecipes(List<String> recipeLinks, List<WebElement> recipes) {
         // todo: remove hack
@@ -61,11 +61,70 @@ public class Crawler {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        String url = "https://www.jadlonomia.com/rodzaj_dania/dania-glowne/";
-
+    public static void run() throws InterruptedException {
         System.setProperty("webdriver.chrome.whitelistedIps", "");
+
         ChromeOptions chromeOptions = new ChromeOptions();
+        setChromeOptions(chromeOptions);
+
+        WebDriver driver = new ChromeDriver(chromeOptions);
+
+        driver.get(recipeListUrl);
+        loadMoreRecipes(driver, 2);
+        parseRecipes(driver);
+        
+
+//        WebElement recipe = driver.findElement(By.xpath("//article[@itemtype=\"http://schema.org/Recipe\"]"));
+//        WebElement recipeParent = driver.findElement(By.xpath("//article[@itemtype=\"http://schema.org/Recipe\"]/.."));
+//
+//        List<WebElement> recipes = recipeParent.findElements(By.xpath("//a[@itemprop=\"url\"]"));
+//
+//
+//        List<String> recipeLinks = new ArrayList<>();
+//
+//        System.out.println(recipe);
+//        System.out.println(recipe.getAttribute("itemtype"));
+//
+//        addRecipes(recipeLinks, recipes);
+
+    //    int i=0;
+    //    for(String element : recipeLinks){
+    //         i++;
+    //        System.out.println(i+element);
+    //    }
+
+//        ArrayList<Recipe> recipeList = new ArrayList<>();
+//
+//        for(String another_url : recipeLinks){
+//           recipeList.add(new Recipe(another_url, driver));
+//        }
+
+//todo randomizer do osobnej klasy
+        
+//        int randomRecipeIndex = (int)(Math.random()*recipeList.size());
+//
+//        Recipe object = recipeList.get(randomRecipeIndex);
+//
+//        object.printTitle(object.getUrl(), object.getDriver());
+//
+//        printData(object.getIngredients());
+//        printData(object.getPreparation());
+//        printData(object.getAdditionalInfo());
+
+        // Close driver
+        driver.quit();
+    }
+//todo: print do osobnej klasy
+    
+//    public static void printData(ArrayList<String> dataList) {
+//        for(int i = 0; i < dataList.size(); i++) {
+//            System.out.println((i + 1) + ". " + dataList.get(i));
+//        }
+//        System.out.print("\n");
+//    }
+
+    private static void setChromeOptions(ChromeOptions chromeOptions) {
+        // TODO: Check which options are needed
         chromeOptions.addArguments("--start-fullscreen");
         chromeOptions.addArguments("--safebrowsing-disable-download-protection");
         chromeOptions.addArguments("--no-sandbox");
@@ -82,16 +141,12 @@ public class Crawler {
         chromeOptions.addArguments("--force-device-scale-factor=1");
         chromeOptions.addArguments("--remote-allow-origins=*");
         chromeOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
+    }
 
-        WebDriver driver = new ChromeDriver(chromeOptions);
-
-        driver.manage().window().maximize();
-
-        driver.get(url);
-        loadMoreRecipes(driver, 2);
-
+    private static void parseRecipes(WebDriver driver) {
         WebElement recipe = driver.findElement(By.xpath("//article[@itemtype=\"http://schema.org/Recipe\"]"));
         WebElement recipeParent = driver.findElement(By.xpath("//article[@itemtype=\"http://schema.org/Recipe\"]/.."));
+        DatabaseHandler saver = new DatabaseHandler();
 
         List<WebElement> recipes = recipeParent.findElements(By.xpath("//a[@itemprop=\"url\"]"));
 
@@ -103,36 +158,18 @@ public class Crawler {
 
         addRecipes(recipeLinks, recipes);
 
-    //    int i=0;
-    //    for(String element : recipeLinks){
-    //         i++;
-    //        System.out.println(i+element);
-    //    }
-
         ArrayList<Recipe> recipeList = new ArrayList<>();
 
         for(String another_url : recipeLinks){
-           recipeList.add(new Recipe(another_url, driver));
+            recipeList.add(new Recipe(another_url, driver));
         }
+        System.out.println(recipeList.get(recipeList.size()-1).getAdditionalInfo());
+        saver.save(recipeList.get(0).getUrl(), recipeList.get(0).getDriver());
 
-        int randomRecipeIndex = (int)(Math.random()*recipeList.size());
+//        for (Recipe value : recipeList) {
+//            saver.save(value.getUrl(), value.getDriver());
+//            saver.load(value.getUrl(), value.getDriver());
+//        }
 
-        Recipe object = recipeList.get(randomRecipeIndex);
-
-        object.printTitle(object.getUrl(), object.getDriver());
-
-        printData(object.getIngredients(), object);
-        printData(object.getPreparation(), object);
-        printData(object.getAdditionalInfo(), object);
-
-        // Close driver
-        driver.quit();
-    }
-
-    public static void printData(ArrayList<String> dataList, Recipe object) {
-        for(int i = 0; i < dataList.size(); i++) {
-            System.out.println((i + 1) + ". " + dataList.get(i));
-        }
-        System.out.print("\n");
     }
 }
