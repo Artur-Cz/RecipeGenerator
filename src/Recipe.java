@@ -14,7 +14,8 @@ public class Recipe implements Serializable {
     transient String additionalInfoXpath = "//*[@id=\"RecipeCard\"]/div[@class=\"hyphenate\"]/ul";
     transient String titleXpath = "/html/head/title";
 
-    transient final String url;
+    private final String url;
+    //TODO: Extract driver to separate entity?
     transient final WebDriver driver;
     private final ArrayList<String> ingredients;
     private final ArrayList<String> preparation;

@@ -99,7 +99,7 @@ public class Crawler {
 //           recipeList.add(new Recipe(another_url, driver));
 //        }
 
-//todo randomizer do osobnej klasy
+//todo: randomizer do osobnej klasy
         
 //        int randomRecipeIndex = (int)(Math.random()*recipeList.size());
 //
@@ -164,12 +164,52 @@ public class Crawler {
             recipeList.add(new Recipe(another_url, driver));
         }
         System.out.println(recipeList.get(recipeList.size()-1).getAdditionalInfo());
-        saver.save(recipeList.get(0).getUrl(), recipeList.get(0).getDriver());
 
-//        for (Recipe value : recipeList) {
-//            saver.save(value.getUrl(), value.getDriver());
-//            saver.load(value.getUrl(), value.getDriver());
-//        }
+        for (Recipe value : recipeList) {
+            saver.save(value);
+        }
 
+        System.out.println("Read data:");
+
+        ArrayList<Recipe> newRecipeList = saver.loadAll();
+        for (Recipe value : newRecipeList) {
+            System.out.println(value.getUrl());
+        }
+
+        // ArrayList<SimpleClass> newRecipeList = saver.loadAllS();
+    }
+
+    private static boolean compareRecipeURL(List<WebElement> websiteRecipes) {
+        DatabaseHandler loader = new DatabaseHandler();
+        ArrayList<Recipe> recipeList = loader.loadAll();
+        boolean isNotAdded = true;
+
+        for (Recipe recipe : recipeList) {
+            for (WebElement websiteElement : websiteRecipes) {
+                if(!(recipe.getUrl().equals(websiteElement.getAttribute("href")))) {
+                    isNotAdded = false;
+                    break;
+                }
+            }
+        }
+
+        return isNotAdded;
     }
 }
+
+
+/*
+
+        ArrayList<Recipe> newRecipeList = saver.loadAll();
+        // tu masz stare przepisy
+
+        // szukasz nowych przepisow w necie
+        // jak znalazles nowy to -> newRecipeList.add(nowy)
+
+        // zapisujesz wszystko (stare i nowe bo jest już w tej liście)
+        // save wywali stary plik przy pierwszym wywołaniu ale masz w liscie szystko więc potem się zapisze
+
+        for (Recipe value : newRecipeList) {
+            saver.save(value);
+        }
+*/
